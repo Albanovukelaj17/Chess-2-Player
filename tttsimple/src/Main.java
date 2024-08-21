@@ -1,16 +1,17 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-        // Press Opt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        // Press Ctrl+R or click the green arrow button in the gutter to run the code.
+        System.out.println("Welcome to Tic-Tac-Toe!");
+        System.out.println("This is a two-player game where Player X and Player O take turns.");
+        System.out.println("The goal is to get three of your marks in a row, either horizontally, vertically, or diagonally.");
+        System.out.println("Players will enter the row and column where they want to place their mark.");
+        System.out.println("The game ends when there is a winner or the board is full, resulting in a tie.");
+        System.out.println("Let's start the game!");
+
+
         for (int i = 1; i <= 5; i++) {
 
-            // Press Ctrl+D to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Cmd+F8.
+
             System.out.println("i = " + i);
         }
     }
