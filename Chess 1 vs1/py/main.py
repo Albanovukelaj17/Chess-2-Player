@@ -11,6 +11,15 @@ pygame.display.set_caption('Chess')
 
 font = pygame.font.SysFont(None, 24)
 
+pieces = {}
+SQUARE_SIZE = 100
+
+column_to_alpha = { 0 : 'A', 1: 'B', 2: 'C', 3: 'D',4 : 'E', 5: 'F',6: 'G',7: 'H'}
+
+moves = []
+def chess_notation(row,column):
+    return f"{column_to_alpha[column]}{8-row}"
+
 def draw_board():
     WIN.fill(pygame.Color("black"))
     colors = [pygame.Color("white"), pygame.Color("gray")]
@@ -18,95 +27,123 @@ def draw_board():
     numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
     for row in range(8):
         for columns in range(8):
-            color =colors[( row+columns)%2]
-            pygame.draw.rect(WIN,color,pygame.Rect(row*100+50,columns*100+50,100,100))
-
+            color = colors[(row + columns) % 2]
+            pygame.draw.rect(WIN, color, pygame.Rect(columns * SQUARE_SIZE + 50, row * SQUARE_SIZE + 50, SQUARE_SIZE, SQUARE_SIZE))
 
             if row == 7:
-                text = font.render(alphabet[columns],True,pygame.Color("red"))
-                WIN.blit(text,(columns*100+100-text.get_width()//2,HEIGHT-25))
+                text = font.render(alphabet[columns], True, pygame.Color("red"))
+                WIN.blit(text, (columns * SQUARE_SIZE + 100 - text.get_width() // 2, HEIGHT - 25))
             if columns == 0:  # First column (where numbers should appear)
                 text_surface = font.render(numbers[7 - row], True, pygame.Color("red"))
-                WIN.blit(text_surface, (25, row * 100 + 100 - text_surface.get_height() // 2))
+                WIN.blit(text_surface, (25, row * SQUARE_SIZE + 100 - text_surface.get_height() // 2))
 
-    pygame.display.update()
-
-def draw_text(text,position,color):
-    text_surface = font.render(text,True,color)
-    WIN.blit(text_surface,position)
-
-
-def load_piece(image_path, position):
+def load_piece(image_path):
     try:
         image = pygame.image.load(image_path)
-        image = pygame.transform.scale(image, (100, 100))
-        WIN.blit(image, position)
-        pygame.display.update()
+        image = pygame.transform.scale(image, (SQUARE_SIZE, SQUARE_SIZE))
+        return image
     except pygame.error as e:
         print(f"Unable to load image: {e}")
         sys.exit()
 
-
 def place_black_pieces():
-    pawns_positions = [(x * 100 + 50, 150) for x in range(8)]
-    pawn_image_path = "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_pdt60.png"
-    for pos in pawns_positions:
-        load_piece(pawn_image_path, pos)
+    pawn_image = load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_pdt60.png")
+    for col in range(8):
+        pieces[chess_notation(1, col)] = ("black_pawn", pawn_image)
 
-    #rooks
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png",(50,50))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png",(750,50))
+    pieces[chess_notation(0, 0)] = ("black_rook", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png"))
+    pieces[chess_notation(0, 7)] = ("black_rook", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png"))
 
-    #bishops
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png",(250,50))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png",(550,50))
+    pieces[chess_notation(0, 2)] = ("black_bishop", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png"))
+    pieces[chess_notation(0, 5)] = ("black_bishop", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png"))
 
-    #knights
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png",(150,50))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png",(650,50))
+    pieces[chess_notation(0, 1)] = ("black_knight", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png"))
+    pieces[chess_notation(0, 6)] = ("black_knight", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png"))
 
-    #queen,king
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_qdt60.png",(350,50))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_kdt60.png",(450,50))
-
+    pieces[chess_notation(0, 3)] = ("black_queen", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_qdt60.png"))
+    pieces[chess_notation(0, 4)] = ("black_king", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_kdt60.png"))
 
 def place_white_pieces():
-    pawns_positions = [(x * 100 + 50, 650) for x in range(8)]
-    pawn_image_path = "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_plt60.png"
-    for pos in pawns_positions:
-        load_piece(pawn_image_path, pos)
+    pawn_image = load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_plt60.png")
+    for col in range(8):
+        pieces[chess_notation(6, col)] = ("white_pawn", pawn_image)
 
-    #rooks
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png",(50,750))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png",(750,750))
+    pieces[chess_notation(7, 0)] = ("white_rook", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png"))
+    pieces[chess_notation(7, 7)] = ("white_rook", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png"))
 
-    #bishops
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png",(250,750))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png",(550,750))
+    pieces[chess_notation(7, 2)] = ("white_bishop", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png"))
+    pieces[chess_notation(7, 5)] = ("white_bishop", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png"))
 
-    #knights
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png",(150,750))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png",(650,750))
+    pieces[chess_notation(7, 1)] = ("white_knight", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png"))
+    pieces[chess_notation(7, 6)] = ("white_knight", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png"))
 
-    #queen,king
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_qlt60.png",(350,750))
-    load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_klt60.png",(450,750))
-def move_detector():
-    draw_text("Move List", (1100,100),pygame.Color("white"))  # Draw text in the center
-    pygame.display.update()
-    pygame.time.delay(1000)
+    pieces[chess_notation(7, 3)] = ("white_queen", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_qlt60.png"))
+    pieces[chess_notation(7, 4)] = ("white_king", load_piece("/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_klt60.png"))
+
+def draw_pieces():
+    for position, (piece_name, piece_image) in pieces.items():
+        col = ord(position[0]) - ord('A')
+        row = 8 -int(position[1])
+        WIN.blit(piece_image, (col * SQUARE_SIZE + 50, row * SQUARE_SIZE + 50))
+
+def get_square_under_mouse():
+    mouse_pos = pygame.mouse.get_pos()
+    column = (mouse_pos[0] - 50) // SQUARE_SIZE
+    row = (mouse_pos[1] - 50) // SQUARE_SIZE
+    if 0 <= row < 8 and 0 <= column< 8:
+        return chess_notation(row, column)
+    return None
+
+def move_piece(start_pos, end_pos):
+    if end_pos in pieces:
+        del pieces[end_pos]
+    piece_name, _ = pieces[start_pos]
+    moves.append(f"{piece_name}: {start_pos} to {end_pos}")
+    pieces[end_pos] = pieces.pop(start_pos)
+
+
+def draw_move_list():
+    start_y = 50
+    y_offset = 30
+    start_x_white = 900
+    start_x_black = 1100
+
+    for i, move in enumerate(moves):
+        move_text = font.render(move, True, pygame.Color("white"))
+
+
+        if i % 2 == 0:
+            WIN.blit(move_text, (start_x_white, start_y + (i // 2) * y_offset))
+        else:
+            WIN.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
 
 def main():
     draw_board()
     place_black_pieces()
     place_white_pieces()
 
+
+    selected_piece = None
+
     while True:
+        draw_board()
+        draw_pieces()
+        draw_move_list()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        move_detector()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clicked_square = get_square_under_mouse()
+                if clicked_square:
+                    if selected_piece:
+                        move_piece(selected_piece, clicked_square)
+                        selected_piece = None
+                    elif clicked_square in pieces:
+                        selected_piece = clicked_square
+
+        pygame.display.update()
+
 if __name__ == "__main__":
     main()
-
