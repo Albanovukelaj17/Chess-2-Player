@@ -95,11 +95,13 @@ def get_square_under_mouse():
     return None
 
 def move_piece(start_pos, end_pos):
-    if end_pos in pieces:
-        del pieces[end_pos]
-    piece_name, _ = pieces[start_pos]
-    moves.append(f"{piece_name}: {start_pos} to {end_pos}")
-    pieces[end_pos] = pieces.pop(start_pos)
+
+    if move_validator(start_pos, end_pos):
+             if end_pos in pieces:
+                 del pieces[end_pos]
+             piece_name, _ = pieces[start_pos]
+             moves.append(f"{piece_name}: {start_pos} to {end_pos}")
+             pieces[end_pos] = pieces.pop(start_pos)
 
 
 def draw_move_list():
@@ -116,6 +118,27 @@ def draw_move_list():
             WIN.blit(move_text, (start_x_white, start_y + (i // 2) * y_offset))
         else:
             WIN.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
+
+
+def move_validator(start_pos, end_pos):
+    pieces_name, _ = pieces[start_pos]
+    if pieces_name  == "white_pawn":
+        return move_validator_white_pawn(start_pos,end_pos)
+    return True
+
+def move_validator_white_pawn(start_pos, end_pos):
+    start_row = int(start_pos[1])
+    start_column= ord(start_pos[0])-ord('A')
+    end_row = int(end_pos[1])
+    end_column= ord(end_pos[0])-ord('A')
+
+
+    if start_row == 2 and end_row == 4 and start_column == end_column and chess_notation(start_row+1,start_column) not in pieces and chess_notation(start_row+2,start_column) not in pieces :
+        return True #first 2 steps
+
+    if start_row +1 == end_row and start_column== end_column and chess_notation(start_row+1,start_column) not in pieces:
+        return True
+    return False
 
 def main():
     draw_board()
