@@ -127,20 +127,37 @@ def move_validator(start_pos, end_pos):
     return True
 
 def move_validator_white_pawn(start_pos, end_pos):
-    start_row = int(start_pos[1])
+    start_row= int(start_pos[1])  #A1 -> 1
+    start_row_piece_notation= -start_row+ 8
     start_column= ord(start_pos[0])-ord('A')
     end_row = int(end_pos[1])
     end_column= ord(end_pos[0])-ord('A')
 
+    one_step_forward =chess_notation(start_row_piece_notation-1, start_column)
+    two_step_forward = chess_notation(start_row_piece_notation-2, start_column)
+    right_step_diagonal = chess_notation(start_row_piece_notation-1, start_column+1)
+    left_step_diagonal = chess_notation(start_row_piece_notation-1, start_column-1)
+    print( f"row:{start_row}")
+    print(f"{start_pos},{start_column}, {start_row}, {end_pos}, {end_column}, {end_row}")
+    #d2 ->    D2,          3                2           d4          3            4
+    print( f"one step forward::{one_step_forward}, two_steps_forward:{two_step_forward}")
+    #            +1 = d5 ,   +2 = d4
+    #should be   +1 = d3,    +2 = d4
 
-    if start_row == 2 and end_row == 4 and start_column == end_column and chess_notation(start_row+1,start_column) not in pieces and chess_notation(start_row+2,start_column) not in pieces :
+    print ( f"start_row +1 == end_row:{start_row +1 == end_row} ,start_column== end_colum:{ start_column== end_column },one_step_forward not in pieces:{ one_step_forward not in pieces}")
+
+    if start_row == 2 and end_row == 4 and start_column == end_column and one_step_forward not in pieces and two_step_forward not in pieces :
         return True #first 2 steps
-
-    if start_row +1 == end_row and start_column== end_column and chess_notation(start_row+1,start_column) not in pieces:
+    if start_row +1 == end_row and start_column== end_column and one_step_forward not in pieces:
+        return True #normal 1 step
+    if start_row +1 == end_row and start_column!= end_column and right_step_diagonal in pieces  and start_column +1 == end_column:
+        return True
+    if start_row + 1 == end_row and start_column != end_column and left_step_diagonal in pieces and  start_column -1 == end_column:
         return True
     return False
 
 def main():
+
     draw_board()
     place_black_pieces()
     place_white_pieces()
