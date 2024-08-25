@@ -5,7 +5,7 @@ import sys
 pygame.init()
 
 # Set up display
-WIDTH, HEIGHT = 1400, 900
+WIDTH, HEIGHT = 1600, 900
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Chess')
 
@@ -122,8 +122,10 @@ def draw_move_list():
 
 def move_validator(start_pos, end_pos):
     pieces_name, _ = pieces[start_pos]
-    if pieces_name  == "white_pawn":
+    if pieces_name== "white_pawn":
         return move_validator_white_pawn(start_pos,end_pos)
+    elif pieces_name== "black_pawn":
+        return move_validator_black_pawn(start_pos,end_pos)
     return True
 
 def move_validator_white_pawn(start_pos, end_pos):
@@ -135,26 +137,79 @@ def move_validator_white_pawn(start_pos, end_pos):
 
     one_step_forward =chess_notation(start_row_piece_notation-1, start_column)
     two_step_forward = chess_notation(start_row_piece_notation-2, start_column)
-    right_step_diagonal = chess_notation(start_row_piece_notation-1, start_column+1)
-    left_step_diagonal = chess_notation(start_row_piece_notation-1, start_column-1)
-    print( f"row:{start_row}")
-    print(f"{start_pos},{start_column}, {start_row}, {end_pos}, {end_column}, {end_row}")
-    #d2 ->    D2,          3                2           d4          3            4
-    print( f"one step forward::{one_step_forward}, two_steps_forward:{two_step_forward}")
-    #            +1 = d5 ,   +2 = d4
-    #should be   +1 = d3,    +2 = d4
 
-    print ( f"start_row +1 == end_row:{start_row +1 == end_row} ,start_column== end_colum:{ start_column== end_column },one_step_forward not in pieces:{ one_step_forward not in pieces}")
+    if start_column +1 <8 :
+        right_step_diagonal = chess_notation(start_row_piece_notation-1, start_column+1)
+    else:
+        right_step_diagonal = None #index out of bounds exception
+
+    if start_column - 1 >= 0:
+        left_step_diagonal = chess_notation(start_row_piece_notation-1, start_column-1)
+    else:
+        left_step_diagonal = None #index out of bounds exception
+
+    if end_pos in pieces:
+        piece_name, _= pieces[end_pos]
+        if "white" in piece_name:
+          return False #not same color
 
     if start_row == 2 and end_row == 4 and start_column == end_column and one_step_forward not in pieces and two_step_forward not in pieces :
         return True #first 2 steps
+
     if start_row +1 == end_row and start_column== end_column and one_step_forward not in pieces:
         return True #normal 1 step
-    if start_row +1 == end_row and start_column!= end_column and right_step_diagonal in pieces  and start_column +1 == end_column:
-        return True
-    if start_row + 1 == end_row and start_column != end_column and left_step_diagonal in pieces and  start_column -1 == end_column:
-        return True
+
+    if start_row +1 == end_row and start_column!= end_column:
+           if start_column +1 == end_column and right_step_diagonal in pieces:
+               return True #take diagonally right
+
+    if start_row + 1 == end_row and start_column != end_column:
+            if left_step_diagonal in pieces and  start_column -1 == end_column:
+                 return True #take diagonally left
     return False
+
+
+def move_validator_black_pawn(start_pos, end_pos):
+    start_row = int(start_pos[1])  # A1 -> 1
+    start_row_piece_notation = -start_row + 8
+    start_column = ord(start_pos[0]) - ord('A')
+    end_row = int(end_pos[1])
+    end_column = ord(end_pos[0]) - ord('A')
+
+    one_step_forward = chess_notation(start_row_piece_notation + 1, start_column)
+    two_step_forward = chess_notation(start_row_piece_notation + 2, start_column)
+
+    if start_column + 1 < 8:
+        left_step_diagonal = chess_notation(start_row_piece_notation +1, start_column + 1)
+    else:
+        left_step_diagonal = None #index out of bounds exception
+
+    if start_column - 1 >= 0:
+        right_step_diagonal = chess_notation(start_row_piece_notation +1, start_column - 1)
+    else:
+        right_step_diagonal = None #index out of bounds exception
+
+
+    if end_pos in pieces:
+        piece_name, _ = pieces[end_pos]
+        if "black" in piece_name:
+            return False  # not same color
+
+    if start_row == 7 and end_row == 5 and start_column == end_column and one_step_forward not in pieces and two_step_forward not in pieces:
+        return True  # first 2 steps
+
+    if start_row -1 == end_row and start_column == end_column and one_step_forward not in pieces:
+        return True  # normal 1 step
+
+    if start_row -1 == end_row and start_column != end_column:
+        if start_column -1 == end_column and right_step_diagonal in pieces:
+            return True  # take diagonally right
+
+    if start_row -1 == end_row and start_column != end_column:
+        if start_column + 1 == end_column and left_step_diagonal in pieces:
+            return True  # take diagonally left
+    return False
+
 
 def main():
 
