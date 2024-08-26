@@ -14,6 +14,8 @@ font = pygame.font.SysFont(None, 24)
 pieces = {}
 SQUARE_SIZE = 100
 
+last_move = None
+
 column_to_alpha = { 0 : 'A', 1: 'B', 2: 'C', 3: 'D',4 : 'E', 5: 'F',6: 'G',7: 'H'}
 
 moves = []
@@ -94,15 +96,54 @@ def get_square_under_mouse():
         return chess_notation(row, column)
     return None
 
+
 def move_piece(start_pos, end_pos):
+    global last_move
+    piece_name, _ = pieces[start_pos]
+
+
+    if piece_name in ["white_pawn", "black_pawn"]:
+        if move_validator_en_passant(start_pos, end_pos):
+            if piece_name == "white_pawn":
+                captured_pawn_position = f"{end_pos[0]}{int(end_pos[1]) - 1}"
+            else:
+                captured_pawn_position = f"{end_pos[0]}{int(end_pos[1]) + 1}"
+
+            if captured_pawn_position in pieces:
+                del pieces[captured_pawn_position]
 
     if move_validator(start_pos, end_pos):
-             if end_pos in pieces:
-                 del pieces[end_pos]
-             piece_name, _ = pieces[start_pos]
-             moves.append(f"{piece_name}: {start_pos} to {end_pos}")
-             pieces[end_pos] = pieces.pop(start_pos)
+        pieces[end_pos] = pieces.pop(start_pos)
+        moves.append(f"{piece_name}: {start_pos} to {end_pos}")
 
+        if piece_name == "white_pawn" and start_pos[1] == '2' and end_pos[1] == '4':
+            last_move = (piece_name, end_pos)
+        elif piece_name == "black_pawn" and start_pos[1] == '7' and end_pos[1] == '5':
+            last_move = (piece_name, end_pos)
+        else:
+            last_move = None
+
+def move_validator_en_passant(start_pos, end_pos):
+    global last_move
+    if not last_move:
+        return False
+
+    last_piece_name, last_pos = last_move
+
+    start_column = ord(start_pos[0]) - ord('A')
+    end_column = ord(end_pos[0]) - ord('A')
+
+    # For white pawns
+    if last_piece_name == "black_pawn" and start_pos[1] == '5' and end_pos[1] == '6':
+        if last_pos[0] == end_column and abs(start_column - end_column) == 1:
+            return True
+
+    # For black pawns
+    if last_piece_name == "white_pawn" and start_pos[1] == '4' and end_pos[1] == '3':
+        if last_pos[0] == end_pos[0] and abs(start_column - end_column) == 1:
+            return True
+
+    return False
 
 def draw_move_list():
     start_y = 50
@@ -120,12 +161,58 @@ def draw_move_list():
             WIN.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
 
 
+def move_validator_rook(start_pos, end_pos):
+    start_row = int(start_pos[1])
+    end_row = int(end_pos[1])
+    start_column = ord(start_pos[0]) - ord('A')
+    end_column = ord(end_pos[0]) - ord('A')
+    start_row_notation= -start_row+8
+
+
+    #same colour not allowed
+    if end_pos in pieces: #pieces[endpos] keyerrror if no one there
+
+        pieces_name, _ = pieces[end_pos]
+        if "white" in pieces_name:
+            return False
+
+    #diagonal move not allowed
+    if start_row != end_row and start_column != end_column:
+        return False
+
+
+    #sprung not allowed
+    if start_row == end_row:  # Horizontale Bewegung
+            step = 1 if end_column > start_column else -1
+            for column in range(start_column + step, end_column, step):
+                pos_to_check = chess_notation(start_row_notation, column)
+                if pos_to_check in pieces and pos_to_check != end_pos:  # Prüfen, ob eine Figur auf diesem Feld steht
+                    print(f"pos_to_check:{pos_to_check},{pos_to_check in pieces}")
+                    return False
+    else:  # Vertikale Bewegung
+            step = 1 if end_row > start_row else -1
+            for row in range(start_row + step, end_row, step):
+                row= -row+8
+                pos_to_check = chess_notation(row, start_column)
+                print(f"pos_to_check:{pos_to_check}")
+
+                if pos_to_check in pieces and pos_to_check != end_pos : # Prüfen, ob eine Figur auf diesem Feld steht
+                    return False
+
+    return True
+
+
 def move_validator(start_pos, end_pos):
     pieces_name, _ = pieces[start_pos]
+    print(f"{start_pos},{end_pos},{pieces_name}")
+
     if pieces_name== "white_pawn":
         return move_validator_white_pawn(start_pos,end_pos)
     elif pieces_name== "black_pawn":
         return move_validator_black_pawn(start_pos,end_pos)
+    elif pieces_name== "white_rook":
+
+        return move_validator_rook(start_pos,end_pos)
     return True
 
 def move_validator_white_pawn(start_pos, end_pos):
