@@ -175,6 +175,12 @@ def move_validator(start_pos, end_pos):
         return move_validator_black_pawn(start_pos, end_pos)
     elif pieces_name == "white_rook" or pieces_name == "black_rook":
         return move_validator_rook(start_pos, end_pos)
+    elif pieces_name=="white_bishop" or pieces_name == "black_bishop":
+        return move_validator_bishop(start_pos, end_pos)
+    elif pieces_name== "white_queen" or pieces_name == "black_queen":
+        return move_validator_queen(start_pos, end_pos)
+    elif pieces_name == "white_king" or pieces_name == "black_king":
+        return move_validator_king(start_pos, end_pos)
     return True
 
 
@@ -199,7 +205,76 @@ def move_validator_en_passant(start_pos, end_pos):
             return True
 
     return False
+def move_validator_king(start_pos, end_pos):
+    start_row = int(start_pos[1])
+    end_row = int(end_pos[1])
+    start_column = ord(start_pos[0]) - ord('A')
+    end_column = ord(end_pos[0]) - ord('A')
 
+    if end_pos in pieces:
+        piece_name, _ = pieces[start_pos]
+        end_piece_name, _ = pieces[end_pos]
+
+        if ("white" in piece_name and "white" in end_piece_name) or (
+                "black" in piece_name and "black" in end_piece_name):
+            return False
+
+    row_diff = abs(start_row - end_row)
+    col_diff = abs(start_column - end_column)
+
+    if row_diff <= 1 and col_diff <= 1:
+        return True
+    return False
+
+def move_validator_queen(start_pos, end_pos):
+
+    if move_validator_rook(start_pos, end_pos) or move_validator_bishop(start_pos, end_pos):
+
+        if end_pos in pieces:
+            piece_name, _ = pieces[start_pos]
+            end_piece_name, _ = pieces[end_pos]
+
+            if ("white" in piece_name and "white" in end_piece_name) or ("black" in piece_name and "black" in end_piece_name):
+                return False
+        return True
+    return False
+
+def move_validator_bishop(start_pos, end_pos):
+    start_row = int(start_pos[1])
+    end_row = int(end_pos[1])
+    start_column = ord(start_pos[0]) - ord('A')
+    end_column = ord(end_pos[0]) - ord('A')
+    start_row_notation = -start_row + 8
+
+
+    if abs(start_row - end_row) != abs(start_column - end_column):
+        return False
+
+
+    step_row = 1 if end_row > start_row else -1
+    step_col = 1 if end_column > start_column else -1
+
+
+    for step in range(1, abs(end_row - start_row)):
+        intermediate_row = start_row + step * step_row
+        intermediate_col = start_column + step * step_col
+        pos_to_check = chess_notation(8 - intermediate_row, intermediate_col)
+
+        if pos_to_check in pieces:
+            return False
+
+
+    if end_pos in pieces:
+        s_piece_name, _ = pieces[start_pos]
+        pieces_name, _ = pieces[end_pos]
+        print(f"pieces_name: {pieces_name}, s_piece_name: {s_piece_name}")
+
+
+        if ("white" in s_piece_name and "white" in pieces_name) or ("black" in s_piece_name and "black" in pieces_name):
+            return False
+
+
+    return True
 
 def move_validator_rook(start_pos, end_pos):
     start_row = int(start_pos[1])
