@@ -56,56 +56,56 @@ def load_piece(image_path):
 
 def place_black_pieces():
     pawn_image = load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_pdt60.png")
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_pdt60.png")
     for col in range(8):
         pieces[chess_notation(1, col)] = ("black_pawn", pawn_image)
 
     pieces[chess_notation(0, 0)] = ("black_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_rdt60.png"))
     pieces[chess_notation(0, 7)] = ("black_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_rdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_rdt60.png"))
 
     pieces[chess_notation(0, 2)] = ("black_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_bdt60.png"))
     pieces[chess_notation(0, 5)] = ("black_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_bdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_bdt60.png"))
 
     pieces[chess_notation(0, 1)] = ("black_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_ndt60.png"))
     pieces[chess_notation(0, 6)] = ("black_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_ndt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_ndt60.png"))
 
     pieces[chess_notation(0, 3)] = ("black_queen", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_qdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_qdt60.png"))
     pieces[chess_notation(0, 4)] = ("black_king", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/black pieces/Chess_kdt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_kdt60.png"))
 
 
 def place_white_pieces():
     pawn_image = load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_plt60.png")
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_plt60.png")
     for col in range(8):
         pieces[chess_notation(6, col)] = ("white_pawn", pawn_image)
 
     pieces[chess_notation(7, 0)] = ("white_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_rlt60.png"))
     pieces[chess_notation(7, 7)] = ("white_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_rlt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_rlt60.png"))
 
     pieces[chess_notation(7, 2)] = ("white_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_blt60.png"))
     pieces[chess_notation(7, 5)] = ("white_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_blt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_blt60.png"))
 
     pieces[chess_notation(7, 1)] = ("white_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_nlt60.png"))
     pieces[chess_notation(7, 6)] = ("white_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_nlt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_nlt60.png"))
 
     pieces[chess_notation(7, 3)] = ("white_queen", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_qlt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_qlt60.png"))
     pieces[chess_notation(7, 4)] = ("white_king", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Just-Learning/Chess 1 vs1/white pieces/Chess_klt60.png"))
+        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_klt60.png"))
 
 
 def draw_pieces():
@@ -181,6 +181,8 @@ def move_validator(start_pos, end_pos):
         return move_validator_queen(start_pos, end_pos)
     elif pieces_name == "white_king" or pieces_name == "black_king":
         return move_validator_king(start_pos, end_pos)
+    elif pieces_name == "white_knight" or pieces_name == "black_knight":
+        return move_validator_knight(start_pos, end_pos)
     return True
 
 
@@ -205,6 +207,51 @@ def move_validator_en_passant(start_pos, end_pos):
             return True
 
     return False
+
+def move_validator_knight(start_pos, end_pos):
+
+        start_row = int(start_pos[1])
+        end_row = int(end_pos[1])
+        start_column = ord(start_pos[0]) - ord('A')
+        end_column = ord(end_pos[0]) - ord('A')
+        start_row_notation = -start_row + 8
+
+
+        if end_pos in pieces:
+              pieces_name, _ = pieces[end_pos]
+              s_pieces_name,_ = pieces[start_pos]
+              if "white" in pieces_name and "white" in s_pieces_name:
+                   return False
+              if "black" in pieces_name and "black" in s_pieces_name:
+                   return False
+
+
+
+        print(f"end_pos:{end_pos},ch:{start_row_notation-2},{start_column-1}")
+        theoretical_moves= [(start_row_notation-2,start_column-1),
+                            (start_row_notation-2,start_column+1),
+                            (start_row_notation-1,start_column-2),
+                            (start_row_notation-1,start_column+2),
+                            (start_row_notation+1,start_column-2),
+                            (start_row_notation+1,start_column+2),
+                            (start_row_notation+2,start_column-1),
+                            (start_row_notation+2,start_column+1)]
+
+        valid_moves = []
+        for row,column in theoretical_moves:
+            if 0 <= row < 8 and 0 <= column < 8:
+                valid_moves.append(chess_notation(row,column))
+
+
+        if end_pos in valid_moves:
+            return True
+        return False
+
+
+
+
+
+
 def move_validator_king(start_pos, end_pos):
     start_row = int(start_pos[1])
     end_row = int(end_pos[1])
