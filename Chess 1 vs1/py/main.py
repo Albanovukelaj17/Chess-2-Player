@@ -19,6 +19,7 @@ last_move = None
 column_to_alpha = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H'}
 
 moves = []
+selected_square = None
 
 
 def chess_notation(row, column):
@@ -28,11 +29,17 @@ def chess_notation(row, column):
 def draw_board():
     WIN.fill(pygame.Color("black"))
     colors = [pygame.Color("white"), pygame.Color("gray")]
+    selected_color = pygame.Color("light blue")
     alphabet = ["A", "B", "C", "D", "E", "F", "G", "H"]
     numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
     for row in range(8):
         for columns in range(8):
             color = colors[(row + columns) % 2]
+            if selected_square:
+                selected_row = 8 - int(selected_square[1])
+                selected_column = ord(selected_square[0]) - ord('A')
+                if selected_row == row and selected_column == columns:
+                    color = selected_color
             pygame.draw.rect(WIN, color,
                              pygame.Rect(columns * SQUARE_SIZE + 50, row * SQUARE_SIZE + 50, SQUARE_SIZE, SQUARE_SIZE))
 
@@ -140,7 +147,7 @@ def draw_move_list():
 
 
 def move_piece(start_pos, end_pos):
-    global last_move
+    global last_move,selected_square
     piece_name, _ = pieces[start_pos]
 
     if piece_name in ["white_pawn", "black_pawn"]:
@@ -163,6 +170,9 @@ def move_piece(start_pos, end_pos):
             last_move = (piece_name, end_pos)
         else:
             last_move = None
+
+        selected_square = None
+
 
 
 def move_validator(start_pos, end_pos):
@@ -349,7 +359,7 @@ def move_validator_rook(start_pos, end_pos):
         step = 1 if end_column > start_column else -1
         for column in range(start_column + step, end_column, step):
             pos_to_check = chess_notation(start_row_notation, column)
-            if pos_to_check in pieces and pos_to_check != end_pos:  # Prüfen, ob eine Figur auf diesem Feld steht
+            if pos_to_check in pieces and pos_to_check != end_pos:
                 return False
     else:  # Vertikale Bewegung
         step = 1 if end_row > start_row else -1
@@ -357,7 +367,7 @@ def move_validator_rook(start_pos, end_pos):
             row = -row + 8
             pos_to_check = chess_notation(row, start_column)
 
-            if pos_to_check in pieces and pos_to_check != end_pos:  # Prüfen, ob eine Figur auf diesem Feld steht
+            if pos_to_check in pieces and pos_to_check != end_pos:
                 return False
 
     return True
@@ -445,9 +455,60 @@ def move_validator_black_pawn(start_pos, end_pos):
     return False
 
 
+def white_king_in_check():
+   king_pos= None
+   for piece_pos,(piece_name,_) in pieces :
+       if piece_name == "white_king":
+           king_pos = piece_pos
+           break
+   if king_pos is None:
+       raise ValueError("White King missing,failed Game")
+
+
+   for piece_pos, (piece_name, _) in pieces.items():
+       if "black" in piece_name:
+           if move_validator(piece_pos, king_pos):
+
+               return True
+
+   return False
+
+def black_king_in_check():
+       king_pos= None
+       for piece_pos,(piece_name,_) in pieces :
+           if piece_name == "black_king":
+               king_pos = piece_pos
+               break
+       if king_pos is None:
+           raise ValueError("Black King missing,failed Game")
+
+
+       for piece_pos, (piece_name, _) in pieces.items():
+           if "white" in piece_name:
+               if move_validator(piece_pos, king_pos):
+
+                   return True
+
+       return False
+
+
+def get_all_legal_moves_for_piece(piece_pos):
+    legal_moves = []
+    for row in range(1, 9):
+        for col in 'ABCDEFGH':
+            potential_move = f"{col}{row}"
+            if move_validator(piece_pos, potential_move):
+                legal_moves.append(potential_move)
+    return legal_moves
+
+
+
+
 def main():
+    global selected_square
     draw_board()
     place_black_pieces()
+
     place_white_pieces()
 
     selected_piece = None
@@ -469,6 +530,9 @@ def main():
                         selected_piece = None
                     elif clicked_square in pieces:
                         selected_piece = clicked_square
+
+
+                        selected_square = clicked_square
 
         pygame.display.update()
 
