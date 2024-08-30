@@ -147,7 +147,8 @@ def draw_move_list():
 
 
 def move_piece(start_pos, end_pos):
-    global last_move,selected_square
+    global last_move, selected_square
+
     piece_name, _ = pieces[start_pos]
 
     if piece_name in ["white_pawn", "black_pawn"]:
@@ -161,9 +162,14 @@ def move_piece(start_pos, end_pos):
                 del pieces[captured_pawn_position]
 
     if move_validator(start_pos, end_pos):
+        captured_piece = pieces.pop(end_pos, None)  # Capture the piece if there is one
         pieces[end_pos] = pieces.pop(start_pos)
         moves.append(f"{piece_name}: {start_pos} to {end_pos}")
 
+
+
+
+        # Handle special cases like en passant, castling, etc.
         if piece_name == "white_pawn" and start_pos[1] == '2' and end_pos[1] == '4':
             last_move = (piece_name, end_pos)
         elif piece_name == "black_pawn" and start_pos[1] == '7' and end_pos[1] == '5':
@@ -172,11 +178,17 @@ def move_piece(start_pos, end_pos):
             last_move = None
 
         selected_square = None
-
-
+    else:
+        print("Invalid move")
 
 def move_validator(start_pos, end_pos):
+    current_player =get_current_player()
     pieces_name, _ = pieces[start_pos]
+    print(f"Player {current_player} is {pieces_name}")
+    if (current_player == "white" and "black" in pieces_name)or (current_player == "black" and "white" in pieces_name):
+        return False
+
+
     print(f"{start_pos},{end_pos},{pieces_name}")
 
     if pieces_name == "white_pawn":
@@ -457,7 +469,7 @@ def move_validator_black_pawn(start_pos, end_pos):
 
 def white_king_in_check():
    king_pos= None
-   for piece_pos,(piece_name,_) in pieces :
+   for piece_pos,(piece_name,_) in pieces.items() :
        if piece_name == "white_king":
            king_pos = piece_pos
            break
@@ -475,7 +487,7 @@ def white_king_in_check():
 
 def black_king_in_check():
        king_pos= None
-       for piece_pos,(piece_name,_) in pieces :
+       for piece_pos,(piece_name,_) in pieces.items() :
            if piece_name == "black_king":
                king_pos = piece_pos
                break
@@ -502,6 +514,16 @@ def get_all_legal_moves_for_piece(piece_pos):
     return legal_moves
 
 
+def moves_avoid_check(piece_pos, color):
+
+
+   pass
+
+def get_current_player():
+
+    if len(moves) %2 == 1 :
+        return "black"
+    else: return "white"
 
 
 def main():
