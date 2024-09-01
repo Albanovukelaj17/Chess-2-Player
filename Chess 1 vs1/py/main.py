@@ -148,8 +148,7 @@ def draw_move_list():
 
 def move_piece(start_pos, end_pos):
     global last_move, selected_square
-    current_player = get_current_player()
-    print(f"Current player: {current_player},wk= {white_king_in_check()},bk: {black_king_in_check()}")
+
     piece_name, _ = pieces[start_pos]
 
     if piece_name in ["white_pawn", "black_pawn"]:
@@ -161,17 +160,28 @@ def move_piece(start_pos, end_pos):
 
             if captured_pawn_position in pieces:
                 del pieces[captured_pawn_position]
-    if white_king_in_check() and current_player == "white"  or black_king_in_check() and current_player == "black":
-        return False
+
     if move_validator(start_pos, end_pos):
-        captured_piece = pieces.pop(end_pos, None)  # Capture the piece if there is one
-        pieces[end_pos] = pieces.pop(start_pos)
+
+        original_position = pieces.pop(start_pos)
+        captured_piece = pieces.pop(end_pos, None)
+        pieces[end_pos] = original_position
+
+        if (get_current_player() == "white" and white_king_in_check()) or (get_current_player() == "black" and black_king_in_check()):
+
+            pieces[start_pos] = original_position
+            if captured_piece:
+                pieces[end_pos] = captured_piece
+            else:
+                del pieces[end_pos]
+            print("Invalid move: King would still be in check")
+            return
+
+
+        pieces[end_pos] = original_position
         moves.append(f"{piece_name}: {start_pos} to {end_pos}")
 
 
-
-
-        # Handle special cases like en passant, castling, etc.
         if piece_name == "white_pawn" and start_pos[1] == '2' and end_pos[1] == '4':
             last_move = (piece_name, end_pos)
         elif piece_name == "black_pawn" and start_pos[1] == '7' and end_pos[1] == '5':
@@ -182,7 +192,6 @@ def move_piece(start_pos, end_pos):
         selected_square = None
     else:
         print("Invalid move")
-
 
 def move_validator(start_pos, end_pos, check_for_check=True):
     print(f"Checking move from {start_pos} to {end_pos}")
@@ -478,23 +487,24 @@ def move_validator_black_pawn(start_pos, end_pos):
 
 
 def white_king_in_check():
-   king_pos= None
-   for piece_pos,(piece_name,_) in pieces.items() :
-       if piece_name == "white_king":
-           king_pos = piece_pos
-           break
-   print(f"wh.king_pos={king_pos}")
-   if king_pos is None:
-       raise ValueError("White King missing,failed Game")
+    king_pos = None
+    for piece_pos, (piece_name, _) in pieces.items():
+        if piece_name == "white_king":
+            king_pos = piece_pos
+            break
 
+    if king_pos is None:
+        raise ValueError("White King missing, failed Game")
 
-   for piece_pos, (piece_name, _) in pieces.items():
-       if "black" in piece_name:
-           if move_validator(piece_pos, king_pos):
+    for piece_pos, (piece_name, _) in pieces.items():
+        if "black" in piece_name:
+            print(f"Found black piece: {piece_name} at {piece_pos}")
+            if move_validator(piece_pos, king_pos, check_for_check=False):
+                print(f"pieces_pos={piece_pos}, king_pos={king_pos}")
+                return True
 
-               return True
+    return False
 
-   return False
 
 def black_king_in_check():
     king_pos = None
