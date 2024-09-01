@@ -148,7 +148,8 @@ def draw_move_list():
 
 def move_piece(start_pos, end_pos):
     global last_move, selected_square
-
+    current_player = get_current_player()
+    print(f"Current player: {current_player},wk= {white_king_in_check()},bk: {black_king_in_check()}")
     piece_name, _ = pieces[start_pos]
 
     if piece_name in ["white_pawn", "black_pawn"]:
@@ -160,7 +161,8 @@ def move_piece(start_pos, end_pos):
 
             if captured_pawn_position in pieces:
                 del pieces[captured_pawn_position]
-
+    if white_king_in_check() and current_player == "white"  or black_king_in_check() and current_player == "black":
+        return False
     if move_validator(start_pos, end_pos):
         captured_piece = pieces.pop(end_pos, None)  # Capture the piece if there is one
         pieces[end_pos] = pieces.pop(start_pos)
@@ -181,15 +183,21 @@ def move_piece(start_pos, end_pos):
     else:
         print("Invalid move")
 
-def move_validator(start_pos, end_pos):
-    current_player =get_current_player()
+
+def move_validator(start_pos, end_pos, check_for_check=True):
+    print(f"Checking move from {start_pos} to {end_pos}")
+    current_player = get_current_player()
     pieces_name, _ = pieces[start_pos]
-    print(f"Player {current_player} is {pieces_name}")
-    if (current_player == "white" and "black" in pieces_name)or (current_player == "black" and "white" in pieces_name):
-        return False
+    print(f"Piece at start_pos: {pieces_name}")
 
+    if check_for_check:
+        # Überprüfung, ob der aktuelle Spieler das Stück bewegt
+        if (current_player == "white" and "black" in pieces_name) or (
+                current_player == "black" and "white" in pieces_name):
+            print("Invalid move: Attempting to move opponent's piece")
+            return False
 
-    print(f"{start_pos},{end_pos},{pieces_name}")
+    print("Continuing with move validation...")
 
     if pieces_name == "white_pawn":
         return move_validator_white_pawn(start_pos, end_pos)
@@ -197,14 +205,15 @@ def move_validator(start_pos, end_pos):
         return move_validator_black_pawn(start_pos, end_pos)
     elif pieces_name == "white_rook" or pieces_name == "black_rook":
         return move_validator_rook(start_pos, end_pos)
-    elif pieces_name=="white_bishop" or pieces_name == "black_bishop":
+    elif pieces_name == "white_bishop" or pieces_name == "black_bishop":
         return move_validator_bishop(start_pos, end_pos)
-    elif pieces_name== "white_queen" or pieces_name == "black_queen":
+    elif pieces_name == "white_queen" or pieces_name == "black_queen":
         return move_validator_queen(start_pos, end_pos)
     elif pieces_name == "white_king" or pieces_name == "black_king":
         return move_validator_king(start_pos, end_pos)
     elif pieces_name == "white_knight" or pieces_name == "black_knight":
         return move_validator_knight(start_pos, end_pos)
+
     return True
 
 
@@ -249,7 +258,7 @@ def move_validator_knight(start_pos, end_pos):
 
 
 
-        print(f"end_pos:{end_pos},ch:{start_row_notation-2},{start_column-1}")
+
         theoretical_moves= [(start_row_notation-2,start_column-1),
                             (start_row_notation-2,start_column+1),
                             (start_row_notation-1,start_column-2),
@@ -336,7 +345,7 @@ def move_validator_bishop(start_pos, end_pos):
     if end_pos in pieces:
         s_piece_name, _ = pieces[start_pos]
         pieces_name, _ = pieces[end_pos]
-        print(f"pieces_name: {pieces_name}, s_piece_name: {s_piece_name}")
+
 
 
         if ("white" in s_piece_name and "white" in pieces_name) or ("black" in s_piece_name and "black" in pieces_name):
@@ -356,7 +365,8 @@ def move_validator_rook(start_pos, end_pos):
     if end_pos in pieces:  #pieces[endpos] keyerrror if no one there
         s_pieces_name, _ = pieces[start_pos]
         pieces_name, _ = pieces[end_pos]
-        print(f"start{s_pieces_name},end{pieces_name}")
+
+
         if s_pieces_name == 'white_rook' and "white" in pieces_name :
             return False
         if s_pieces_name == 'black_rook' and "black" in pieces_name :
@@ -473,6 +483,7 @@ def white_king_in_check():
        if piece_name == "white_king":
            king_pos = piece_pos
            break
+   print(f"wh.king_pos={king_pos}")
    if king_pos is None:
        raise ValueError("White King missing,failed Game")
 
@@ -486,22 +497,24 @@ def white_king_in_check():
    return False
 
 def black_king_in_check():
-       king_pos= None
-       for piece_pos,(piece_name,_) in pieces.items() :
-           if piece_name == "black_king":
-               king_pos = piece_pos
-               break
-       if king_pos is None:
-           raise ValueError("Black King missing,failed Game")
+    king_pos = None
+    for piece_pos, (piece_name, _) in pieces.items():
+        if piece_name == "black_king":
+            king_pos = piece_pos
+            break
 
+    if king_pos is None:
+        raise ValueError("Black King missing, failed Game")
 
-       for piece_pos, (piece_name, _) in pieces.items():
-           if "white" in piece_name:
-               if move_validator(piece_pos, king_pos):
+    for piece_pos, (piece_name, _) in pieces.items():
+        if "white" in piece_name:
+            print(f"Found white piece: {piece_name} at {piece_pos}")
+            if move_validator(piece_pos, king_pos, check_for_check=False):
+                print(f"pieces_pos={piece_pos}, king_pos={king_pos}")
+                return True
 
-                   return True
+    return False
 
-       return False
 
 
 def get_all_legal_moves_for_piece(piece_pos):
