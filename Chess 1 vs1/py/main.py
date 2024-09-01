@@ -21,6 +21,12 @@ column_to_alpha = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H
 moves = []
 selected_square = None
 
+white_king_moved = False
+black_king_moved = False
+white_rook_kingside_moved = False
+white_rook_queenside_moved = False
+black_rook_kingside_moved = False
+black_rook_queenside_moved = False
 
 def chess_notation(row, column):
     return f"{column_to_alpha[column]}{8 - row}"
@@ -288,30 +294,50 @@ def move_validator_knight(start_pos, end_pos):
         return False
 
 
-
-
-
-
 def move_validator_king(start_pos, end_pos):
+    global white_king_moved, white_rook_kingside_moved
+
     start_row = int(start_pos[1])
     end_row = int(end_pos[1])
     start_column = ord(start_pos[0]) - ord('A')
     end_column = ord(end_pos[0]) - ord('A')
 
-    if end_pos in pieces:
-        piece_name, _ = pieces[start_pos]
-        end_piece_name, _ = pieces[end_pos]
-
-        if ("white" in piece_name and "white" in end_piece_name) or (
-                "black" in piece_name and "black" in end_piece_name):
-            return False
 
     row_diff = abs(start_row - end_row)
     col_diff = abs(start_column - end_column)
 
     if row_diff <= 1 and col_diff <= 1:
+        print("Valid normal king move.")
+        white_king_moved = True
         return True
+
+
+    if start_pos == "E1" and end_pos == "G1":
+        if not white_king_moved and not white_rook_kingside_moved:
+            if "F1" not in pieces and "G1" not in pieces:
+                if not white_king_in_check() and not is_square_attacked("F1", "black") and not is_square_attacked("G1",
+                                                                                                                  "black"):
+                    print("Valid white kingside castling.")
+                    white_king_moved = True
+                    white_rook_kingside_moved = True
+                    return True
+                else:
+                    print("Invalid move: King cannot castle through check or onto check.")
+            else:
+                print("Invalid move: Squares between king and rook are not empty.")
+        else:
+            print("Invalid move: King or rook has already moved.")
+
+    print("Invalid move: Does not match any valid king moves.")
     return False
+def is_square_attacked(square, opponent_color):
+    for piece_pos, (piece_name, _) in pieces.items():
+        if opponent_color in piece_name:
+            if move_validator(piece_pos, square, check_for_check=False):
+                return True
+    return False
+
+
 
 def move_validator_queen(start_pos, end_pos):
 
@@ -527,20 +553,7 @@ def black_king_in_check():
 
 
 
-def get_all_legal_moves_for_piece(piece_pos):
-    legal_moves = []
-    for row in range(1, 9):
-        for col in 'ABCDEFGH':
-            potential_move = f"{col}{row}"
-            if move_validator(piece_pos, potential_move):
-                legal_moves.append(potential_move)
-    return legal_moves
 
-
-def moves_avoid_check(piece_pos, color):
-
-
-   pass
 
 def get_current_player():
 
