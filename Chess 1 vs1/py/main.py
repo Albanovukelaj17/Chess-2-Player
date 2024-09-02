@@ -74,51 +74,51 @@ def place_black_pieces():
         pieces[chess_notation(1, col)] = ("black_pawn", pawn_image)
 
     pieces[chess_notation(0, 0)] = ("black_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_rdt60.png"))
+        "../black pieces/Chess_rdt60.png"))
     pieces[chess_notation(0, 7)] = ("black_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_rdt60.png"))
+        "../black pieces/Chess_rdt60.png"))
 
     pieces[chess_notation(0, 2)] = ("black_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_bdt60.png"))
+        "../black pieces/Chess_bdt60.png"))
     pieces[chess_notation(0, 5)] = ("black_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_bdt60.png"))
+        "../black pieces/Chess_bdt60.png"))
 
     pieces[chess_notation(0, 1)] = ("black_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_ndt60.png"))
+        "../black pieces/Chess_ndt60.png"))
     pieces[chess_notation(0, 6)] = ("black_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_ndt60.png"))
+        "../black pieces/Chess_ndt60.png"))
 
     pieces[chess_notation(0, 3)] = ("black_queen", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_qdt60.png"))
+        "../black pieces/Chess_qdt60.png"))
     pieces[chess_notation(0, 4)] = ("black_king", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/black pieces/Chess_kdt60.png"))
+        "../black pieces/Chess_kdt60.png"))
 
 
 def place_white_pieces():
     pawn_image = load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_plt60.png")
+        "../white pieces/Chess_plt60.png")
     for col in range(8):
         pieces[chess_notation(6, col)] = ("white_pawn", pawn_image)
 
     pieces[chess_notation(7, 0)] = ("white_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_rlt60.png"))
+        "../white pieces/Chess_rlt60.png"))
     pieces[chess_notation(7, 7)] = ("white_rook", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_rlt60.png"))
+        "../white pieces/Chess_rlt60.png"))
 
     pieces[chess_notation(7, 2)] = ("white_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_blt60.png"))
+        "../white pieces/Chess_blt60.png"))
     pieces[chess_notation(7, 5)] = ("white_bishop", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_blt60.png"))
+        "../white pieces/Chess_blt60.png"))
 
     pieces[chess_notation(7, 1)] = ("white_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_nlt60.png"))
+        "../white pieces/Chess_nlt60.png"))
     pieces[chess_notation(7, 6)] = ("white_knight", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_nlt60.png"))
+        "../white pieces/Chess_nlt60.png"))
 
     pieces[chess_notation(7, 3)] = ("white_queen", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_qlt60.png"))
+        "../white pieces/Chess_qlt60.png"))
     pieces[chess_notation(7, 4)] = ("white_king", load_piece(
-        "/Users/albanovukelaj/Desktop/Motherfucker/Chess-2-Player/Chess 1 vs1/white pieces/Chess_klt60.png"))
+        "../white pieces/Chess_klt60.png"))
 
 
 def draw_pieces():
@@ -155,6 +155,14 @@ def draw_move_list():
 def move_piece(start_pos, end_pos):
     global last_move, selected_square
 
+
+    if start_pos not in pieces:
+
+        return  # Keine Aktion ausführen, wenn kein Stück vorhanden ist
+
+    piece_name, _ = pieces[start_pos]
+
+
     piece_name, _ = pieces[start_pos]
 
     if piece_name in ["white_pawn", "black_pawn"]:
@@ -179,7 +187,6 @@ def move_piece(start_pos, end_pos):
         pieces[end_pos] = original_position
 
         if (get_current_player() == "white" and white_king_in_check()) or (get_current_player() == "black" and black_king_in_check()):
-
             pieces[start_pos] = original_position
             if captured_piece:
                 pieces[end_pos] = captured_piece
@@ -192,20 +199,8 @@ def move_piece(start_pos, end_pos):
         moves.append(move_notation)
         last_move = (piece_name, end_pos)
         selected_square = None
-
-
-
-        if piece_name == "white_pawn" and start_pos[1] == '2' and end_pos[1] == '4':
-            last_move = (piece_name, end_pos)
-        elif piece_name == "black_pawn" and start_pos[1] == '7' and end_pos[1] == '5':
-            last_move = (piece_name, end_pos)
-        else:
-            last_move = None
-
-        selected_square = None
     else:
         print("Invalid move")
-
 
 def generate_chess_notation(piece_name, start_pos, end_pos, captured_piece):
     piece_symbol = {
@@ -515,45 +510,85 @@ def move_validator_rook(start_pos, end_pos):
 
 
 def move_validator_white_pawn(start_pos, end_pos):
-    start_row = int(start_pos[1])  #A1 -> 1
+    start_row = int(start_pos[1])
     start_row_piece_notation = -start_row + 8
     start_column = ord(start_pos[0]) - ord('A')
     end_row = int(end_pos[1])
     end_column = ord(end_pos[0]) - ord('A')
+    print(f"er ={end_row},ec ={end_column}")
 
     one_step_forward = chess_notation(start_row_piece_notation - 1, start_column)
     two_step_forward = chess_notation(start_row_piece_notation - 2, start_column)
 
-
     if start_column + 1 < 8:
         right_step_diagonal = chess_notation(start_row_piece_notation - 1, start_column + 1)
     else:
-        right_step_diagonal = None  #index out of bounds exception
+        right_step_diagonal = None  # index out of bounds exception
 
     if start_column - 1 >= 0:
         left_step_diagonal = chess_notation(start_row_piece_notation - 1, start_column - 1)
     else:
-        left_step_diagonal = None  #index out of bounds exception
+        left_step_diagonal = None  # index out of bounds exception
 
     if end_pos in pieces:
         piece_name, _ = pieces[end_pos]
         if "white" in piece_name:
-            return False  #not same color
+            return False  # not same color
 
     if start_row == 2 and end_row == 4 and start_column == end_column and one_step_forward not in pieces and two_step_forward not in pieces:
-        return True  #first 2 steps
+        return True  # first 2 steps
 
     if start_row + 1 == end_row and start_column == end_column and one_step_forward not in pieces:
-        return True  #normal 1 step
+        if end_row == 8:  # Promotion condition
+            chosen_piece, piece_image = white_promotion(end_column)
+            print(f"{chosen_piece} is {pieces[end_pos]}")
+            pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
+            del pieces[start_pos]  # Entferne den Bauern von der Startposition
+        return True  # normal 1 step
 
     if start_row + 1 == end_row and start_column != end_column:
         if start_column + 1 == end_column and right_step_diagonal in pieces:
-            return True  #take diagonally right
+            if end_row == 8:  # Promotion condition
+
+                chosen_piece, piece_image = white_promotion(end_column)
+
+                pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
+                del pieces[start_pos]  # Entferne den Bauern von der Startposition
+            return True  # take diagonally right
 
     if start_row + 1 == end_row and start_column != end_column:
         if left_step_diagonal in pieces and start_column - 1 == end_column:
-            return True  #take diagonally left
+            if end_row == 8:  # Promotion condition
+                chosen_piece, piece_image = white_promotion(end_column)
+                pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
+                del pieces[start_pos]  # Entferne den Bauern von der Startposition
+            return True  # take diagonally left
     return False
+
+
+
+def white_promotion(end_column):
+    valid_pieces = ["queen", "rook", "bishop", "knight"]
+    chosen_piece = ""
+
+    while chosen_piece not in valid_pieces:
+        chosen_piece = input("Choose a piece for promotion (queen, rook, bishop, knight): ").strip().lower()
+
+        if chosen_piece not in valid_pieces:
+
+            print("Invalid choice. Please choose again.")
+
+    print(f"{chosen_piece} is {pieces[end_pos]}")
+    if chosen_piece == "queen":
+        piece_image = load_piece("../white pieces/Chess_qlt60.png")
+    elif chosen_piece == "rook":
+        piece_image = load_piece("../white pieces/Chess_rlt60.png")
+    elif chosen_piece == "bishop":
+        piece_image = load_piece("../white pieces/Chess_blt60.png")
+    elif chosen_piece == "knight":
+        piece_image = load_piece("../white pieces/Chess_klt60.png")
+
+    return f"white_{chosen_piece}", piece_image
 
 
 def move_validator_black_pawn(start_pos, end_pos):
@@ -610,6 +645,7 @@ def white_king_in_check():
     for piece_pos, (piece_name, _) in pieces.items():
         if "black" in piece_name:
             print(f"Found black piece: {piece_name} at {piece_pos}")
+
             if move_validator(piece_pos, king_pos, check_for_check=False):
                 print(f"pieces_pos={piece_pos}, king_pos={king_pos}")
                 return True
