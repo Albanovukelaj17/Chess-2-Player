@@ -5,7 +5,7 @@ import sys
 pygame.init()
 
 # Set up display
-WIDTH, HEIGHT = 1600, 900
+WIDTH, HEIGHT = 1300, 900
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Chess')
 
@@ -188,9 +188,11 @@ def move_piece(start_pos, end_pos):
             print("Invalid move: King would still be in check")
             return
 
+        move_notation = generate_chess_notation(piece_name, start_pos, end_pos, captured_piece)
+        moves.append(move_notation)
+        last_move = (piece_name, end_pos)
+        selected_square = None
 
-        pieces[end_pos] = original_position
-        moves.append(f"{piece_name}: {start_pos} to {end_pos}")
 
 
         if piece_name == "white_pawn" and start_pos[1] == '2' and end_pos[1] == '4':
@@ -203,6 +205,50 @@ def move_piece(start_pos, end_pos):
         selected_square = None
     else:
         print("Invalid move")
+
+
+def generate_chess_notation(piece_name, start_pos, end_pos, captured_piece):
+    piece_symbol = {
+        "white_pawn": "",
+        "black_pawn": "",
+        "white_rook": "R",
+        "black_rook": "R",
+        "white_knight": "N",
+        "black_knight": "N",
+        "white_bishop": "B",
+        "black_bishop": "B",
+        "white_queen": "Q",
+        "black_queen": "Q",
+        "white_king": "K",
+        "black_king": "K",
+    }
+
+
+    if piece_name == "white_king" and start_pos == "E1" and end_pos == "G1":
+        return "O-O"
+    if piece_name == "white_king" and start_pos == "E1" and end_pos == "C1":
+        return "O-O-O"
+    if piece_name == "black_king" and start_pos == "E8" and end_pos == "G8":
+        return "O-O"
+    if piece_name == "black_king" and start_pos == "E8" and end_pos == "C8":
+        return "O-O-O"
+
+    capture = "x" if captured_piece else ""
+    start_pos = start_pos.lower()
+    end_pos = end_pos.lower()
+
+    check = "+" if white_king_in_check() or black_king_in_check() else ""
+
+    if piece_name in ["white_pawn", "black_pawn"]:
+        if capture:
+            notation = f"{start_pos[0]}{capture}{end_pos}{check}"
+        else:
+            notation = f"{end_pos}{check}"
+    else:
+        notation = f"{piece_symbol[piece_name]}{capture}{end_pos}{check}"
+
+    return notation
+
 
 def move_validator(start_pos, end_pos, check_for_check=True):
     current_player = get_current_player()
@@ -477,6 +523,7 @@ def move_validator_white_pawn(start_pos, end_pos):
 
     one_step_forward = chess_notation(start_row_piece_notation - 1, start_column)
     two_step_forward = chess_notation(start_row_piece_notation - 2, start_column)
+
 
     if start_column + 1 < 8:
         right_step_diagonal = chess_notation(start_row_piece_notation - 1, start_column + 1)
