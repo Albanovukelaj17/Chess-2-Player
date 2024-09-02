@@ -154,7 +154,7 @@ def draw_move_list():
 
 def move_piece(start_pos, end_pos):
     global last_move, selected_square
-
+    end_column=int(end_pos[1])
 
     if start_pos not in pieces:
 
@@ -163,7 +163,7 @@ def move_piece(start_pos, end_pos):
     piece_name, _ = pieces[start_pos]
 
 
-    piece_name, _ = pieces[start_pos]
+
 
     if piece_name in ["white_pawn", "black_pawn"]:
         if move_validator_en_passant(start_pos, end_pos):
@@ -181,7 +181,7 @@ def move_piece(start_pos, end_pos):
             return
 
     if move_validator(start_pos, end_pos):
-
+     if(end_column!=8 or piece_name != "white_pawn"):
         original_position = pieces.pop(start_pos)
         captured_piece = pieces.pop(end_pos, None)
         pieces[end_pos] = original_position
@@ -371,7 +371,7 @@ def move_validator_king(start_pos, end_pos):
         if not white_king_moved and not white_rook_kingside_moved:
             if "F1" not in pieces and "G1" not in pieces:
                 if not white_king_in_check() and not is_square_attacked("F1", "black") and not is_square_attacked("G1", "black"):
-                    print("Valid white kingside castling.")
+
                     pieces["F1"] = pieces.pop("H1")
                     white_king_moved = True
                     white_rook_kingside_moved = True
@@ -383,7 +383,7 @@ def move_validator_king(start_pos, end_pos):
             if "D1" not in pieces and "C1" not in pieces:
                 if not white_king_in_check() and not is_square_attacked("D1", "black") and not is_square_attacked("C1",
                                                                                                                   "black"):
-                    print("Valid white queenside castling.")
+
                     pieces["D1"] = pieces.pop("A1")
                     white_king_moved = True
                     white_rook_kingside_moved = True
@@ -539,35 +539,36 @@ def move_validator_white_pawn(start_pos, end_pos):
         return True  # first 2 steps
 
     if start_row + 1 == end_row and start_column == end_column and one_step_forward not in pieces:
-        if end_row == 8:  # Promotion condition
+        if end_row == 8:
             chosen_piece, piece_image = white_promotion(end_column)
-            print(f"{chosen_piece} is {pieces[end_pos]}")
-            pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
-            del pieces[start_pos]  # Entferne den Bauern von der Startposition
+            pieces[end_pos] = (chosen_piece, piece_image)
+            moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+            del pieces[start_pos]
         return True  # normal 1 step
 
     if start_row + 1 == end_row and start_column != end_column:
         if start_column + 1 == end_column and right_step_diagonal in pieces:
-            if end_row == 8:  # Promotion condition
+            if end_row == 8:
 
                 chosen_piece, piece_image = white_promotion(end_column)
-
-                pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
-                del pieces[start_pos]  # Entferne den Bauern von der Startposition
+                moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+                pieces[end_pos] = (chosen_piece, piece_image)
+                del pieces[start_pos]
             return True  # take diagonally right
 
     if start_row + 1 == end_row and start_column != end_column:
         if left_step_diagonal in pieces and start_column - 1 == end_column:
             if end_row == 8:  # Promotion condition
                 chosen_piece, piece_image = white_promotion(end_column)
-                pieces[end_pos] = (chosen_piece, piece_image)  # Umgewandelte Figur auf die korrekte Position setzen
-                del pieces[start_pos]  # Entferne den Bauern von der Startposition
+                moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+                pieces[end_pos] = (chosen_piece, piece_image)
+                del pieces[start_pos]
             return True  # take diagonally left
     return False
 
 
 
-def white_promotion(end_column):
+def white_promotion(end_pos):
     valid_pieces = ["queen", "rook", "bishop", "knight"]
     chosen_piece = ""
 
@@ -575,10 +576,12 @@ def white_promotion(end_column):
         chosen_piece = input("Choose a piece for promotion (queen, rook, bishop, knight): ").strip().lower()
 
         if chosen_piece not in valid_pieces:
-
             print("Invalid choice. Please choose again.")
 
-    print(f"{chosen_piece} is {pieces[end_pos]}")
+
+    if end_pos in pieces:
+        print(f"{chosen_piece} is {pieces[end_pos]}")
+
     if chosen_piece == "queen":
         piece_image = load_piece("../white pieces/Chess_qlt60.png")
     elif chosen_piece == "rook":
@@ -589,7 +592,6 @@ def white_promotion(end_column):
         piece_image = load_piece("../white pieces/Chess_klt60.png")
 
     return f"white_{chosen_piece}", piece_image
-
 
 def move_validator_black_pawn(start_pos, end_pos):
     start_row = int(start_pos[1])  # A1 -> 1
@@ -644,10 +646,10 @@ def white_king_in_check():
 
     for piece_pos, (piece_name, _) in pieces.items():
         if "black" in piece_name:
-            print(f"Found black piece: {piece_name} at {piece_pos}")
+
 
             if move_validator(piece_pos, king_pos, check_for_check=False):
-                print(f"pieces_pos={piece_pos}, king_pos={king_pos}")
+
                 return True
 
     return False
@@ -665,9 +667,9 @@ def black_king_in_check():
 
     for piece_pos, (piece_name, _) in pieces.items():
         if "white" in piece_name:
-            print(f"Found white piece: {piece_name} at {piece_pos}")
+
             if move_validator(piece_pos, king_pos, check_for_check=False):
-                print(f"pieces_pos={piece_pos}, king_pos={king_pos}")
+
                 return True
 
     return False
