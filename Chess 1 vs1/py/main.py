@@ -282,6 +282,10 @@ def generate_chess_notation(piece_name, start_pos, end_pos, captured_piece):
     return notation
 
 def move_validator(start_pos, end_pos, check_for_check=True):
+    # Check if the start position contains a piece
+    if start_pos not in pieces:
+        return False
+
     current_player = get_current_player()
     pieces_name, _ = pieces[start_pos]
 
@@ -289,7 +293,6 @@ def move_validator(start_pos, end_pos, check_for_check=True):
         if (current_player == "white" and "black" in pieces_name) or (
                 current_player == "black" and "white" in pieces_name):
             return False
-
 
     if pieces_name == "white_pawn":
         return move_validator_white_pawn(start_pos, end_pos)
@@ -306,7 +309,7 @@ def move_validator(start_pos, end_pos, check_for_check=True):
     elif pieces_name == "white_knight" or pieces_name == "black_knight":
         return move_validator_knight(start_pos, end_pos)
 
-    return True
+    return False
 
 
 def move_validator_en_passant(start_pos, end_pos):
@@ -624,7 +627,6 @@ def move_validator_white_pawn(start_pos, end_pos):
     end_row = int(end_pos[1])
     end_column = ord(end_pos[0]) - ord('A')
 
-
     one_step_forward = chess_notation(start_row_piece_notation - 1, start_column)
     two_step_forward = chess_notation(start_row_piece_notation - 2, start_column)
 
@@ -643,6 +645,7 @@ def move_validator_white_pawn(start_pos, end_pos):
         if "white" in piece_name:
             return False  # not same color
 
+
     if start_row == 2 and end_row == 4 and start_column == end_column and one_step_forward not in pieces and two_step_forward not in pieces:
         return True  # first 2 steps
 
@@ -650,16 +653,15 @@ def move_validator_white_pawn(start_pos, end_pos):
         if end_row == 8:
             chosen_piece, piece_image = white_promotion(end_column)
             pieces[end_pos] = (chosen_piece, piece_image)
-            moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+            moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # kein check or cm
             del pieces[start_pos]
         return True  # normal 1 step
 
     if start_row + 1 == end_row and start_column != end_column:
         if start_column + 1 == end_column and right_step_diagonal in pieces:
             if end_row == 8:
-
                 chosen_piece, piece_image = white_promotion(end_column)
-                moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+                moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # kein check or cm
                 pieces[end_pos] = (chosen_piece, piece_image)
                 del pieces[start_pos]
             return True  # take diagonally right
@@ -668,12 +670,11 @@ def move_validator_white_pawn(start_pos, end_pos):
         if left_step_diagonal in pieces and start_column - 1 == end_column:
             if end_row == 8:  # Promotion condition
                 chosen_piece, piece_image = white_promotion(end_column)
-                moves.append(f"{end_pos.lower()}={chosen_piece[7].upper()}") #kein check or cm
+                moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # kein check or cm
                 pieces[end_pos] = (chosen_piece, piece_image)
                 del pieces[start_pos]
             return True  # take diagonally left
     return False
-
 
 
 def white_promotion(end_pos):
@@ -847,8 +848,10 @@ def main():
         draw_move_list()
         if is_checkmate("black") :
             draw_checkmate_message("white")
+
         if is_checkmate("white") :
             draw_checkmate_message("black")
+
         #unendliche schleife , abbruch ?
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
