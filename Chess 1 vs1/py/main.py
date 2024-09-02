@@ -28,37 +28,53 @@ white_rook_queenside_moved = False
 black_rook_kingside_moved = False
 black_rook_queenside_moved = False
 
-# Global variable to track if checkmate has occurred
+
 checkmate = False
 winning_player = ""
+selected_legal_moves = []
 
 def chess_notation(row, column):
     return f"{column_to_alpha[column]}{8 - row}"
 
 
-def draw_board():
+def draw_board(selected_legal_moves):
+    global checkmate, winning_player
+
     WIN.fill(pygame.Color("black"))
     colors = [pygame.Color("white"), pygame.Color("gray")]
     selected_color = pygame.Color("light blue")
+    light_blue = pygame.Color("light blue")
+    move_highlight_color = pygame.Color(min(light_blue.r + 50, 255),
+    min(light_blue.g + 50, 255),
+    min(light_blue.b + 50, 255))
+
     alphabet = ["A", "B", "C", "D", "E", "F", "G", "H"]
     numbers = ["1", "2", "3", "4", "5", "6", "7", "8"]
+
     for row in range(8):
         for columns in range(8):
             color = colors[(row + columns) % 2]
             if selected_square:
                 selected_row = 8 - int(selected_square[1])
-                selected_column = ord(selected_square[0]) - ord('A')
+                selected_column = ord(selected_square [0]) - ord('A')
                 if selected_row == row and selected_column == columns:
                     color = selected_color
+            pos = chess_notation(row, columns)
+            if pos in selected_legal_moves:
+                color = move_highlight_color
+
             pygame.draw.rect(WIN, color,
                              pygame.Rect(columns * SQUARE_SIZE + 50, row * SQUARE_SIZE + 50, SQUARE_SIZE, SQUARE_SIZE))
 
             if row == 7:
                 text = font.render(alphabet[columns], True, pygame.Color("red"))
                 WIN.blit(text, (columns * SQUARE_SIZE + 100 - text.get_width() // 2, HEIGHT - 25))
-            if columns == 0:  # First column (where numbers should appear)
+            if columns == 0:
                 text_surface = font.render(numbers[7 - row], True, pygame.Color("red"))
                 WIN.blit(text_surface, (25, row * SQUARE_SIZE + 100 - text_surface.get_height() // 2))
+
+    if checkmate:  # Wenn Checkmate erkannt wurde, Nachricht anzeigen
+        draw_checkmate_message(winning_player)
 
 
 def load_piece(image_path):
@@ -159,13 +175,21 @@ def draw_move_list():
 
 
 def move_piece(start_pos, end_pos):
-    global last_move, selected_square, checkmate, winning_player
+    global last_move, selected_square
     end_column = int(end_pos[1])
 
     if start_pos not in pieces:
-        return
+        return  # No action if there's no piece at start_pos
 
+    bc = is_checkmate("black")
+    wc = is_checkmate("white")
     piece_name, _ = pieces[start_pos]
+    print(f"{bc},{wc}")
+
+    if get_current_player() == "black" and is_checkmate("black"):
+        print("Checkmate! White wins.")
+    elif get_current_player() == "white" and is_checkmate("white"):
+        print("Checkmate! Black wins.")
 
     if piece_name in ["white_pawn", "black_pawn"]:
         if move_validator_en_passant(start_pos, end_pos):
@@ -180,45 +204,31 @@ def move_piece(start_pos, end_pos):
             moves.append(f"{piece_name}: {start_pos} to {end_pos}")
             last_move = (piece_name, end_pos)
             selected_square = None
-
-
-            if get_current_player() == "black" and is_checkmate("black"):
-                checkmate = True
-                winning_player = "White"
-            elif get_current_player() == "white" and is_checkmate("white"):
-                checkmate = True
-                winning_player = "Black"
-
             return
 
     if move_validator(start_pos, end_pos):
-        original_position = pieces.pop(start_pos)
-        captured_piece = pieces.pop(end_pos, None)
-        pieces[end_pos] = original_position
+        if (end_column != 8 or piece_name != "white_pawn") and (end_column != 1 or piece_name != "black_pawn"):
+            original_position = pieces.pop(start_pos)
+            captured_piece = pieces.pop(end_pos, None)
+            pieces[end_pos] = original_position
 
-        if (get_current_player() == "white" and white_king_in_check()) or (get_current_player() == "black" and black_king_in_check()):
-            pieces[start_pos] = original_position
-            if captured_piece:
-                pieces[end_pos] = captured_piece
-            else:
-                del pieces[end_pos]
-            print("Invalid move: King would still be in check")
-            return
+            if (get_current_player() == "white" and white_king_in_check()) or (get_current_player() == "black" and black_king_in_check()):
+                pieces[start_pos] = original_position
+                if captured_piece:
+                    pieces[end_pos] = captured_piece
+                else:
+                    del pieces[end_pos]
+                print("Invalid move: King would still be in check")
+                selected_square = None  #no dubble click
+                return
 
-        move_notation = generate_chess_notation(piece_name, start_pos, end_pos, captured_piece)
-        moves.append(move_notation)
-        last_move = (piece_name, end_pos)
-        selected_square = None
-
-
-        if get_current_player() == "black" and is_checkmate("black"):
-            checkmate = True
-            winning_player = "White"
-        elif get_current_player() == "white" and is_checkmate("white"):
-            checkmate = True
-            winning_player = "Black"
+            move_notation = generate_chess_notation(piece_name, start_pos, end_pos, captured_piece)
+            moves.append(move_notation)
+            last_move = (piece_name, end_pos)
+            selected_square = None
     else:
         print("Invalid move")
+        selected_square = None  #no dubble click
 
 def draw_checkmate_message(winning_player):
     font = pygame.font.SysFont(None, 72)  # Larger font for the message
@@ -257,8 +267,9 @@ def generate_chess_notation(piece_name, start_pos, end_pos, captured_piece):
     start_pos = start_pos.lower()
     end_pos = end_pos.lower()
 
+    check =  "+" if (white_king_in_check() or black_king_in_check()) else ""
+        #"#" if (is_checkmate("black") or is_checkmate("white")) else , mal schauen wie
 
-    check = "+" if white_king_in_check() or black_king_in_check() else ""
 
     if piece_name in ["white_pawn", "black_pawn"]:
         if capture:
@@ -269,7 +280,6 @@ def generate_chess_notation(piece_name, start_pos, end_pos, captured_piece):
         notation = f"{piece_symbol[piece_name]}{capture}{end_pos}{check}"
 
     return notation
-
 
 def move_validator(start_pos, end_pos, check_for_check=True):
     current_player = get_current_player()
@@ -458,6 +468,17 @@ def get_all_legal_moves(player_color):
 
     return legal_moves
 
+def get_legal_moves_for_piece(start_pos):
+    legal_moves = []
+    piece_name, _ = pieces[start_pos]
+
+    for row in range(1, 9):
+        for col in 'ABCDEFGH':
+            potential_move = f"{col}{row}"
+            if move_validator(start_pos, potential_move, check_for_check=True):
+                legal_moves.append(potential_move)
+
+    return legal_moves
 
 def is_checkmate(player_color):
 
@@ -814,36 +835,49 @@ def get_current_player():
 
 def main():
     global selected_square, checkmate, winning_player
-    draw_board()
+    selected_legal_moves = []
     place_black_pieces()
     place_white_pieces()
+
     selected_piece = None
 
     while True:
-        draw_board()
+        draw_board(selected_legal_moves)
         draw_pieces()
         draw_move_list()
-
-
-        if checkmate:
-            draw_checkmate_message(winning_player)
-
+        if is_checkmate("black") :
+            draw_checkmate_message("white")
+        if is_checkmate("white") :
+            draw_checkmate_message("black")
+        #unendliche schleife , abbruch ?
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            if not checkmate and event.type == pygame.MOUSEBUTTONDOWN:
-                clicked_square = get_square_under_mouse()
-                if clicked_square:
-                    if selected_piece:
-                        move_piece(selected_piece, clicked_square)
-                        selected_piece = None
-                    elif clicked_square in pieces:
-                        selected_piece = clicked_square
-                        selected_square = clicked_square
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if not checkmate:
+                    clicked_square = get_square_under_mouse()
+                    if clicked_square:
+                        if selected_piece:
+                            move_piece(selected_piece, clicked_square)
+                            selected_piece = None
+                            selected_legal_moves = []
+
+
+                            if get_current_player() == "black" and is_checkmate("white"):
+                                checkmate = True
+                                winning_player = "White"
+                            elif get_current_player() == "white" and is_checkmate("black"):
+                                checkmate = True
+                                winning_player = "Black"
+                        elif clicked_square in pieces:
+                            selected_piece = clicked_square
+                            selected_square = clicked_square
+                            selected_legal_moves = get_legal_moves_for_piece(selected_piece)
 
         pygame.display.update()
+
 
 if __name__ == "__main__":
     main()
