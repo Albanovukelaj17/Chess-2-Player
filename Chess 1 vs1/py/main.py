@@ -181,7 +181,7 @@ def move_piece(start_pos, end_pos):
             return
 
     if move_validator(start_pos, end_pos):
-     if(end_column!=8 or piece_name != "white_pawn"):
+     if(end_column!=8 or piece_name != "white_pawn")and ( end_column != 1 or piece_name != "black_pawn"):
         original_position = pieces.pop(start_pos)
         captured_piece = pieces.pop(end_pos, None)
         pieces[end_pos] = original_position
@@ -606,12 +606,12 @@ def move_validator_black_pawn(start_pos, end_pos):
     if start_column + 1 < 8:
         left_step_diagonal = chess_notation(start_row_piece_notation + 1, start_column + 1)
     else:
-        left_step_diagonal = None  #index out of bounds exception
+        left_step_diagonal = None  # index out of bounds exception
 
     if start_column - 1 >= 0:
         right_step_diagonal = chess_notation(start_row_piece_notation + 1, start_column - 1)
     else:
-        right_step_diagonal = None  #index out of bounds exception
+        right_step_diagonal = None  # index out of bounds exception
 
     if end_pos in pieces:
         piece_name, _ = pieces[end_pos]
@@ -622,17 +622,55 @@ def move_validator_black_pawn(start_pos, end_pos):
         return True  # first 2 steps
 
     if start_row - 1 == end_row and start_column == end_column and one_step_forward not in pieces:
+        if end_row == 1:  # Promotion condition
+            chosen_piece, piece_image = black_promotion(end_column)
+            pieces[end_pos] = (chosen_piece, piece_image)
+            moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # Promotion notation
+            del pieces[start_pos]
         return True  # normal 1 step
 
     if start_row - 1 == end_row and start_column != end_column:
         if start_column - 1 == end_column and right_step_diagonal in pieces:
+            if end_row == 1:  # Promotion condition
+                chosen_piece, piece_image = black_promotion(end_column)
+                moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # Promotion notation
+                pieces[end_pos] = (chosen_piece, piece_image)
+                del pieces[start_pos]
             return True  # take diagonally right
 
     if start_row - 1 == end_row and start_column != end_column:
-        if start_column + 1 == end_column and left_step_diagonal in pieces:
+        if left_step_diagonal in pieces and start_column + 1 == end_column:
+            if end_row == 1:  # Promotion condition
+                chosen_piece, piece_image = black_promotion(end_column)
+                moves.append(f"{end_pos.lower()}={chosen_piece[6].upper()}")  # Promotion notation
+                pieces[end_pos] = (chosen_piece, piece_image)
+                del pieces[start_pos]
             return True  # take diagonally left
     return False
 
+def black_promotion(end_pos):
+    valid_pieces = ["queen", "rook", "bishop", "knight"]
+    chosen_piece = ""
+
+    while chosen_piece not in valid_pieces:
+        chosen_piece = input("Choose a piece for promotion (queen, rook, bishop, knight): ").strip().lower()
+
+        if chosen_piece not in valid_pieces:
+            print("Invalid choice. Please choose again.")
+
+    if end_pos in pieces:
+        print(f"{chosen_piece} is {pieces[end_pos]}")
+
+    if chosen_piece == "queen":
+        piece_image = load_piece("../black pieces/Chess_qdt60.png")
+    elif chosen_piece == "rook":
+        piece_image = load_piece("../black pieces/Chess_rdt60.png")
+    elif chosen_piece == "bishop":
+        piece_image = load_piece("../black pieces/Chess_bdt60.png")
+    elif chosen_piece == "knight":
+        piece_image = load_piece("../black pieces/Chess_ndt60.png")
+
+    return f"black_{chosen_piece}", piece_image
 
 def white_king_in_check():
     king_pos = None
