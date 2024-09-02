@@ -163,14 +163,20 @@ def draw_move_list():
     start_x_white = 900
     start_x_black = 1100
 
+    # Draw the titles
+    white_title = font.render("White side", True, pygame.Color("white"))
+    black_title = font.render("Black side", True, pygame.Color("white"))
+
+    WIN.blit(white_title, (start_x_white, start_y - 30))  # Title for White's side
+    WIN.blit(black_title, (start_x_black, start_y - 30))  # Title for Black's side
+
+    # Display each move in the list
     for i, move in enumerate(moves):
         move_text = font.render(move, True, pygame.Color("white"))
-
         if i % 2 == 0:
             WIN.blit(move_text, (start_x_white, start_y + (i // 2) * y_offset))
         else:
             WIN.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
-
 
 
 
@@ -181,15 +187,9 @@ def move_piece(start_pos, end_pos):
     if start_pos not in pieces:
         return  # No action if there's no piece at start_pos
 
-    bc = is_checkmate("black")
-    wc = is_checkmate("white")
     piece_name, _ = pieces[start_pos]
-    print(f"{bc},{wc}")
 
-    if get_current_player() == "black" and is_checkmate("black"):
-        print("Checkmate! White wins.")
-    elif get_current_player() == "white" and is_checkmate("white"):
-        print("Checkmate! Black wins.")
+
 
     if piece_name in ["white_pawn", "black_pawn"]:
         if move_validator_en_passant(start_pos, end_pos):
@@ -485,7 +485,7 @@ def get_legal_moves_for_piece(start_pos):
 
 def is_checkmate(player_color):
 
-    print(f"bkc= {black_king_in_check()}")
+
     if player_color == "white":
         if not white_king_in_check():
             return False
@@ -496,7 +496,7 @@ def is_checkmate(player_color):
 
     legal_moves = get_all_legal_moves(player_color)
 
-    print("lm= {legal_moves}")
+
     for start_pos, end_pos in legal_moves:
         original_position = pieces[start_pos]
         captured_piece = pieces.pop(end_pos, None)
@@ -688,8 +688,7 @@ def white_promotion(end_pos):
             print("Invalid choice. Please choose again.")
 
 
-    if end_pos in pieces:
-        print(f"{chosen_piece} is {pieces[end_pos]}")
+
 
     if chosen_piece == "queen":
         piece_image = load_piece("../white pieces/Chess_qlt60.png")
@@ -767,8 +766,6 @@ def black_promotion(end_pos):
         if chosen_piece not in valid_pieces:
             print("Invalid choice. Please choose again.")
 
-    if end_pos in pieces:
-        print(f"{chosen_piece} is {pieces[end_pos]}")
 
     if chosen_piece == "queen":
         piece_image = load_piece("../black pieces/Chess_qdt60.png")
@@ -808,7 +805,8 @@ def black_king_in_check():
         if piece_name == "black_king":
             king_pos = piece_pos
             break
-    print(f"kingpos={king_pos}")
+
+
 
     if king_pos is None:
         raise ValueError("Black King missing, failed Game")
@@ -817,10 +815,10 @@ def black_king_in_check():
         if "white" in piece_name:
 
             if move_validator(piece_pos, king_pos, check_for_check=False):
-                print(f"move vali:{move_validator(piece_pos, king_pos, check_for_check=False)}")
+
                 return True
 
-    print(f"move vali:{move_validator(piece_pos, king_pos, check_for_check=False)}")
+
     return False
 
 
@@ -841,18 +839,28 @@ def main():
     place_white_pieces()
 
     selected_piece = None
+    game_over = False  # Variable to track if the game is over
 
     while True:
         draw_board(selected_legal_moves)
         draw_pieces()
         draw_move_list()
-        if is_checkmate("black") :
-            draw_checkmate_message("white")
 
-        if is_checkmate("white") :
-            draw_checkmate_message("black")
+        if game_over:
+            draw_checkmate_message(winning_player)  # Draw checkmate message only once
+            pygame.display.update()
+            continue  # Skip the rest of the loop
 
-        #unendliche schleife , abbruch ?
+        if not checkmate:  # Check for checkmate only if it hasn't been detected yet
+            if is_checkmate("black"):
+                checkmate = True
+                winning_player = "White"
+                game_over = True
+            elif is_checkmate("white"):
+                checkmate = True
+                winning_player = "Black"
+                game_over = True
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -867,13 +875,16 @@ def main():
                             selected_piece = None
                             selected_legal_moves = []
 
-
-                            if get_current_player() == "black" and is_checkmate("white"):
-                                checkmate = True
-                                winning_player = "White"
-                            elif get_current_player() == "white" and is_checkmate("black"):
-                                checkmate = True
-                                winning_player = "Black"
+                            # After a valid move, re-check for checkmate
+                            if not checkmate:
+                                if get_current_player() == "black" and is_checkmate("white"):
+                                    checkmate = True
+                                    winning_player = "White"
+                                    game_over = True
+                                elif get_current_player() == "white" and is_checkmate("black"):
+                                    checkmate = True
+                                    winning_player = "Black"
+                                    game_over = True
                         elif clicked_square in pieces:
                             selected_piece = clicked_square
                             selected_square = clicked_square
@@ -881,6 +892,22 @@ def main():
 
         pygame.display.update()
 
-
 if __name__ == "__main__":
     main()
+
+
+
+#BUGS
+
+#1 black pawn promotion: row 7 , take  king
+#2 white pawn promotion: king figure,no diagonal, lag
+#3 scroll function
+#4 black en passant row 6
+#5 no needed function
+#6 no ties implemented
+#7 table of moves
+#8 point count
+#9 restart button
+#10 back button+ #11 successiv button
+#12 comments
+#13 moves sometimes white to black
