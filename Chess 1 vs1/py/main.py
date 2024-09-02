@@ -166,6 +166,11 @@ def move_piece(start_pos, end_pos):
 
             if captured_pawn_position in pieces:
                 del pieces[captured_pawn_position]
+            pieces[end_pos] = pieces.pop(start_pos)
+            moves.append(f"{piece_name}: {start_pos} to {end_pos}")
+            last_move = (piece_name, end_pos)
+            selected_square = None
+            return
 
     if move_validator(start_pos, end_pos):
 
@@ -200,19 +205,14 @@ def move_piece(start_pos, end_pos):
         print("Invalid move")
 
 def move_validator(start_pos, end_pos, check_for_check=True):
-    print(f"Checking move from {start_pos} to {end_pos}")
     current_player = get_current_player()
     pieces_name, _ = pieces[start_pos]
-    print(f"Piece at start_pos: {pieces_name}")
 
     if check_for_check:
-        # Überprüfung, ob der aktuelle Spieler das Stück bewegt
         if (current_player == "white" and "black" in pieces_name) or (
                 current_player == "black" and "white" in pieces_name):
-            print("Invalid move: Attempting to move opponent's piece")
             return False
 
-    print("Continuing with move validation...")
 
     if pieces_name == "white_pawn":
         return move_validator_white_pawn(start_pos, end_pos)
@@ -238,13 +238,12 @@ def move_validator_en_passant(start_pos, end_pos):
         return False
 
     last_piece_name, last_pos = last_move
-
     start_column = ord(start_pos[0]) - ord('A')
     end_column = ord(end_pos[0]) - ord('A')
 
     # For white pawns
     if last_piece_name == "black_pawn" and start_pos[1] == '5' and end_pos[1] == '6':
-        if last_pos[0] == end_column and abs(start_column - end_column) == 1:
+        if last_pos[0] == end_pos[0] and abs(start_column - end_column) == 1:
             return True
 
     # For black pawns
@@ -253,6 +252,7 @@ def move_validator_en_passant(start_pos, end_pos):
             return True
 
     return False
+
 
 def move_validator_knight(start_pos, end_pos):
 
