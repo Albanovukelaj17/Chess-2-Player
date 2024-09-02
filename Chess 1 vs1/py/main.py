@@ -295,7 +295,7 @@ def move_validator_knight(start_pos, end_pos):
 
 
 def move_validator_king(start_pos, end_pos):
-    global white_king_moved, white_rook_kingside_moved, black_king_moved, black_rook_kingside_moved
+    global white_king_moved, white_rook_kingside_moved, black_king_moved, black_rook_kingside_moved, black_rook_queenside_moved
 
     start_row = int(start_pos[1])
     end_row = int(end_pos[1])
@@ -326,7 +326,7 @@ def move_validator_king(start_pos, end_pos):
             return True
 
 
-    if start_pos == "E1" and end_pos == "G1":
+    if start_pos == "E1" and end_pos == "G1":  #arrocco corto bianco
         if not white_king_moved and not white_rook_kingside_moved:
             if "F1" not in pieces and "G1" not in pieces:
                 if not white_king_in_check() and not is_square_attacked("F1", "black") and not is_square_attacked("G1", "black"):
@@ -336,7 +336,19 @@ def move_validator_king(start_pos, end_pos):
                     white_rook_kingside_moved = True
                     return True
 
-    if start_pos == "E8" and end_pos == "G8":
+
+    if start_pos == "E1" and end_pos == "C1":  #arrocco lungo bianco
+        if not white_king_moved and not white_rook_queenside_moved:
+            if "D1" not in pieces and "C1" not in pieces:
+                if not white_king_in_check() and not is_square_attacked("D1", "black") and not is_square_attacked("C1",
+                                                                                                                  "black"):
+                    print("Valid white queenside castling.")
+                    pieces["D1"] = pieces.pop("A1")
+                    white_king_moved = True
+                    white_rook_kingside_moved = True
+                    return True
+
+    if start_pos == "E8" and end_pos == "G8": #arrocco corto nero
         if not black_king_moved and not black_rook_kingside_moved:
             if "F8" not in pieces and "G8" not in pieces:
                 if not black_king_in_check() and not is_square_attacked("F8", "white") and not is_square_attacked("G8", "white"):
@@ -346,7 +358,15 @@ def move_validator_king(start_pos, end_pos):
                     black_rook_kingside_moved = True
                     return True
 
-    return False
+    if start_pos == "E8" and end_pos == "C8": #arrocco corto nero
+        if not black_king_moved and not black_rook_queenside_moved:
+            if "D8" not in pieces and "C8" not in pieces:
+                if not black_king_in_check() and not is_square_attacked("D8", "white") and not is_square_attacked("C8", "white"):
+
+                    pieces["D8"] = pieces.pop("A8")
+                    black_king_moved = True
+                    black_rook_queenside_moved =True
+                    return True
 
 def is_square_attacked(square, opponent_color):
     for piece_pos, (piece_name, _) in pieces.items():
