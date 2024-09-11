@@ -157,8 +157,13 @@ def get_square_under_mouse():
     return None
 
 
+scroll_offset = 0
 def draw_move_list():
-    start_y = 50
+    global scroll_offset
+    surface = pygame.Surface((WIDTH, HEIGHT))
+    surface.fill(pygame.Color("black"))
+
+    start_y = 50 - scroll_offset
     y_offset = 30
     start_x_white = 900
     start_x_black = 1100
@@ -166,17 +171,23 @@ def draw_move_list():
     # Draw the titles
     white_title = font.render("White side", True, pygame.Color("white"))
     black_title = font.render("Black side", True, pygame.Color("white"))
+    surface.blit(white_title, (start_x_white, start_y - 30))
+    surface.blit(black_title, (start_x_black, start_y - 30))
 
-    WIN.blit(white_title, (start_x_white, start_y - 30))  # Title for White's side
-    WIN.blit(black_title, (start_x_black, start_y - 30))  # Title for Black's side
-
-    # Display each move in the list
     for i, move in enumerate(moves):
         move_text = font.render(move, True, pygame.Color("white"))
         if i % 2 == 0:
-            WIN.blit(move_text, (start_x_white, start_y + (i // 2) * y_offset))
+            surface.blit(move_text, (start_x_white, start_y + (i // 2) * y_offset))
         else:
-            WIN.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
+            surface.blit(move_text, (start_x_black, start_y + (i // 2) * y_offset))
+
+    WIN.blit(surface, (0, 0))
+
+def handle_scroll_event(event):
+    global scroll_offset
+    if event.type == pygame.MOUSEWHEEL:
+        scroll_offset += event.y * 30
+
 
 
 
