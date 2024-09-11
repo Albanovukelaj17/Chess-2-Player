@@ -833,7 +833,20 @@ def black_king_in_check():
     return False
 
 
+def is_stalemate(player_color):
+    if not white_king_in_check() and not black_king_in_check() and not get_all_legal_moves(player_color):
+        return True
+    return False
 
+points = {"pawn": 1, "knight": 3, "bishop": 3, "rook": 5, "queen": 9}
+white_points = 0
+black_points = 0
+
+if "captured_piece":
+    if "white" in captured_piece:
+        black_points += points[captured_piece.split('_')[1]]
+    else:
+        white_points += points[captured_piece.split('_')[1]]
 
 
 def get_current_player():
