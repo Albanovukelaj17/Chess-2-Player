@@ -842,6 +842,30 @@ points = {"pawn": 1, "knight": 3, "bishop": 3, "rook": 5, "queen": 9}
 white_points = 0
 black_points = 0
 
+
+def draw_restart_button():
+    restart_button = pygame.Rect(1150, 50, 100, 50)
+    pygame.draw.rect(WIN, pygame.Color("red"), restart_button)
+    text = font.render("Restart", True, pygame.Color("white"))
+    WIN.blit(text, (restart_button.x + 10, restart_button.y + 10))
+
+def handle_restart_event(event):
+    if event.type == pygame.MOUSEBUTTONDOWN and restart_button.collidepoint(event.pos):
+        reset_game()
+
+
+game_states = []
+def store_game_state():
+    game_states.append(pieces.copy())
+
+def undo_move():
+    if game_states:
+        previous_state = game_states.pop()
+        pieces.clear()
+        pieces.update(previous_state)
+
+
+
 if "captured_piece":
     if "white" in captured_piece:
         black_points += points[captured_piece.split('_')[1]]
