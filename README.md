@@ -2,7 +2,7 @@
 
 Welcome to the Chess Game Project! This is a fun and interactive chess game built with Python and Pygame, designed to bring the classic game of chess to your screen with realistic rules and a clean interface.
 
-**Features**
+## **Features**
 
  **Basic Gameplay**
  
@@ -30,7 +30,7 @@ Welcome to the Chess Game Project! This is a fun and interactive chess game buil
 
 -Board Design: The chessboard features alternating colors and clear labels for rows and columns, making it easy to follow the game.
 
-**Game Flow**
+## **Game Flow**
 
 -Turn-Based Play: The game alternates turns between White and Black, ensuring fair play.
 
@@ -39,14 +39,14 @@ Welcome to the Chess Game Project! This is a fun and interactive chess game buil
 -Game Over Detection: The game knows when it’s over, stopping play when checkmate or stalemate is reached.
 
 
-**Coming Soon**
+## **Coming Soon**
 Undo/Redo: Go back or forward a move for easier gameplay.
 Restart Game: Start a new game with the press of a button.
 Draw Conditions: Implementing stalemates, threefold repetition, and the fifty-move rule.
 Scrollable Move List: Scroll through the move history when it gets long.
 Getting Started
 
-**Prerequisites**
+## **Prerequisites**
  Make sure you have Python installed. You can get it from python.org.
 -Copy Repository 
 ```bash Copy code
